@@ -1,5 +1,5 @@
 import { Request, Res, Body, Controller, Get, Post, Patch, UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { Response } from 'express';
+import { Response, Express } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';

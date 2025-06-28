@@ -1,6 +1,7 @@
 import { Controller, Request, Get, Post, Patch, Delete, Param, Body, Query, UseGuards, HttpCode, ParseUUIDPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiParam } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response, Express } from 'express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { PropertiesService } from './properties.service';
