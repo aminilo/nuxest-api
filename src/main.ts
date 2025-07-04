@@ -36,10 +36,11 @@ async function bootstrap() {
     app.use(csurf({
       cookie: {
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: 'None',
         secure: true,
         maxAge: 7 * 24 * 60 * 60 * 1000
-      }
+      },
+      value: (req) => req.headers['x-csrf-token'] as string
     }));
   }
 
