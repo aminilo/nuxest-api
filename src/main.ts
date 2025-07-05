@@ -14,6 +14,9 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  ['uploads', 'uploads/user-avatars', 'uploads/property-images'].forEach(dir=> { if (!existsSync(dir)) mkdirSync(dir, { recursive: true }); });
+  app.use('/uploads', express.static(join(__dirname, '..', '..', 'uploads')));
+
   app.use(helmet());
   app.use(hpp());
   app.use(cookieParser());
@@ -49,9 +52,6 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true }
     })
   );
-
-  ['uploads', 'uploads/user-avatars', 'uploads/property-images'].forEach(dir=> { if (!existsSync(dir)) mkdirSync(dir, { recursive: true }); });
-  app.use('/uploads', express.static(join(__dirname, '..', '..', 'uploads')));
 
   const swaggerConfig = new DocumentBuilder().setTitle('东西 新开的').setDescription('这是各种的程序API').setVersion('1.0.0').addBearerAuth().build();
 
