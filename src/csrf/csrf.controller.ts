@@ -9,7 +9,7 @@ export class CsrfController {
 	@ApiResponse({ status: 200,  description: 'CSRF Token retrieved successfully!' })
 	getCsrfToken(@Req() req, @Res() res) {
 		const token = req.csrfToken();
-		res.cookie('XSRF-TOKEN', token);
+		res.cookie('XSRF-TOKEN', token, { secure: true, sameSite: 'none' });
 		return res.json({ csrfToken: token });
 	}
 }
