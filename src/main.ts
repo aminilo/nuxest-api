@@ -18,34 +18,26 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
   app.use('/uploads', express.static(join(__dirname, '..', '..', 'uploads')));
-  // app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 
   app.use(helmet());
   app.use(hpp());
 
+  app.use(rateLimit({
+    windowMs: 15 * 60 * 1000, max: 100
+  }));
+
   app.use(cookieParser());
   if( process.env.NODE_ENV === 'production' ){
-    app.use(
-      csurf({
-        cookie: {
-          httpOnly: true,
-          sameSite: 'None',
-          secure: process.env.NODE_ENV === 'production',
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        },
-        value: req => req.headers['x-csrf-token'] as string,
-      })
-    );
+    app.use(csurf({
+      cookie: {
+        httpOnly: true,
+        sameSite: 'None',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      },
+      value: req => req.headers['x-csrf-token'] as string
+    }));
   }
-
-  app.enableCors({
-    origin: process.env.NODE_ENV === 'production' ? 'https://nuxest.vercel.app' : 'http://localhost:3000',
-    credentials: true
-  });
-  app.use(rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100
-  }));
 
   app.useGlobalPipes(
     new ValidationPipe({
