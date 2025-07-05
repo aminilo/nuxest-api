@@ -12,21 +12,23 @@ import * as express from 'express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  ['uploads', 'uploads/user-avatars', 'uploads/property-images'].forEach(dir => {
-    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  });
-
   const app = await NestFactory.create(AppModule);
-  app.use('/uploads', express.static(join(__dirname, '..', '..', 'uploads')));
 
   app.use(helmet());
   app.use(hpp());
-
-  app.use(rateLimit({
-    windowMs: 15 * 60 * 1000, max: 100
-  }));
-
   app.use(cookieParser());
+
+  app.enableCors({ /* so the preflight allows everything frontend needs */
+    origin: process.env.NODE_ENV === 'production'
+      ? 'https://nuxest.vercel.app'
+      : 'http://localhost:3000',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Accept', 'x-csrf-token'],
+    exposedHeaders: ['set-cookie'],
+  });
+
+  app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+
   if( process.env.NODE_ENV === 'production' ){
     app.use(csurf({
       cookie: {
@@ -47,6 +49,9 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true }
     })
   );
+
+  ['uploads', 'uploads/user-avatars', 'uploads/property-images'].forEach(dir=> { if (!existsSync(dir)) mkdirSync(dir, { recursive: true }); });
+  app.use('/uploads', express.static(join(__dirname, '..', '..', 'uploads')));
 
   const swaggerConfig = new DocumentBuilder().setTitle('东西 新开的').setDescription('这是各种的程序API').setVersion('1.0.0').addBearerAuth().build();
 
